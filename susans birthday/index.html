@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#fff8f1" />
+  <title>A little birthday surprise</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+
+    :root {
+      --ink: #442a39;
+      --muted: #856e7b;
+      --berry: #bd5574;
+      --berry-dark: #9c3d5d;
+      --rose: #f7dce2;
+      --cream: #fff8f1;
+      --paper: rgba(255, 255, 255, .82);
+      --shadow: 0 24px 80px rgba(104, 49, 73, .13);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 10% 12%, rgba(245, 204, 213, .72), transparent 34rem),
+        radial-gradient(ellipse at 90% 78%, rgba(255, 222, 186, .54), transparent 31rem),
+        var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+    button { font: inherit; }
+    .sparkle { position: fixed; z-index: -1; color: rgba(189, 85, 116, .2); pointer-events: none; animation: float 7s ease-in-out infinite; }
+    .sparkle.one { top: 14%; left: 7%; font-size: 2rem; }
+    .sparkle.two { top: 66%; right: 8%; font-size: 2.7rem; animation-delay: -2s; }
+    .sparkle.three { top: 39%; right: 15%; font-size: 1.4rem; animation-delay: -4s; }
+    @keyframes float { 50% { transform: translateY(-14px) rotate(12deg); } }
+
+    .page { width: min(calc(100% - 36px), 920px); margin: 0 auto; padding: 46px 0 72px; }
+    .eyebrow { color: var(--berry); font-size: .76rem; font-weight: 700; letter-spacing: .19em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2 { font-family: 'Playfair Display', Georgia, serif; }
+    h1 { margin: 13px 0 16px; font-size: clamp(2.8rem, 8vw, 5.2rem); line-height: 1.02; letter-spacing: -.045em; }
+    h1 span { color: var(--berry); font-style: italic; }
+    .intro { max-width: 560px; margin: 0 auto; color: var(--muted); font-size: 1.08rem; line-height: 1.75; }
+    .hero { text-align: center; padding: 32px 0 42px; }
+    .tiny-heart { display: inline-block; color: var(--berry); animation: heartbeat 1.8s ease-in-out infinite; }
+    @keyframes heartbeat { 50% { transform: scale(1.2); } }
+
+    .card { border: 1px solid rgba(255, 255, 255, .9); border-radius: 28px; background: var(--paper); box-shadow: var(--shadow); backdrop-filter: blur(14px); }
+    .quiz { max-width: 650px; margin: 0 auto; padding: clamp(24px, 6vw, 44px); }
+    .quiz-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 27px; color: var(--muted); font-size: .83rem; font-weight: 600; }
+    .progress { height: 7px; flex: 1; max-width: 230px; overflow: hidden; border-radius: 20px; background: #f4e7e8; }
+    .progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #d77b91, #b44d70); transition: width .4s ease; }
+    .question { min-height: 78px; margin-bottom: 22px; font: 600 clamp(1.5rem, 4vw, 2rem)/1.25 'Playfair Display', Georgia, serif; }
+    .answers { display: grid; gap: 11px; }
+    .answer {
+      width: 100%; padding: 15px 18px; border: 1px solid #f0dce1; border-radius: 15px; color: var(--ink); background: #fffdfb;
+      text-align: left; cursor: pointer; transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .answer:hover, .answer:focus-visible { transform: translateY(-2px); border-color: #d98da0; background: #fff5f5; outline: none; }
+    .answer.selected { border-color: var(--berry); background: #fff0f3; box-shadow: 0 0 0 3px rgba(189, 85, 116, .1); }
+    .quiz.try-again { animation: playful-shake .36s ease; }
+    @keyframes playful-shake { 25% { transform: translateX(-6px) rotate(-.3deg); } 75% { transform: translateX(6px) rotate(.3deg); } }
+    .quiz-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px; }
+    .feedback { min-height: 24px; color: var(--berry-dark); font-size: .88rem; font-weight: 600; }
+    .primary, .secondary {
+      border: 0; border-radius: 999px; padding: 13px 21px; cursor: pointer; font-weight: 700; transition: transform .18s ease, background .18s ease;
+    }
+    .primary { color: white; background: var(--berry); box-shadow: 0 8px 20px rgba(189, 85, 116, .22); }
+    .primary:hover { transform: translateY(-2px); background: var(--berry-dark); }
+    .primary:disabled { opacity: .46; cursor: not-allowed; transform: none; }
+    .secondary { color: var(--berry-dark); background: #fff0f3; }
+    .secondary:hover { transform: translateY(-2px); }
+
+    .surprise { display: none; margin-top: 34px; animation: rise .65s ease both; }
+    .surprise.show { display: block; }
+    @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    .letter { position: relative; overflow: hidden; padding: clamp(28px, 7vw, 58px); }
+    .letter::after { content: '♥'; position: absolute; right: 24px; top: 8px; color: rgba(189, 85, 116, .08); font-size: 8rem; transform: rotate(12deg); }
+    .letter h2, .gallery-heading h2 { margin: 10px 0 20px; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.1; }
+    .letter p { position: relative; z-index: 1; margin: 0; color: #66505d; font-size: 1.02rem; line-height: 1.95; }
+    .signature { margin-top: 25px !important; color: var(--berry) !important; font-family: 'Playfair Display', Georgia, serif; font-size: 1.35rem !important; font-style: italic; }
+
+    .gallery { margin-top: 34px; padding: clamp(24px, 6vw, 40px); background: linear-gradient(145deg, rgba(255,255,255,.92), rgba(255,246,242,.89)); }
+    .gallery-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
+    .gallery-heading h2 { margin-bottom: 0; }
+    .gallery-heading p { max-width: 300px; margin: 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
+    .showtime { display: flex; align-items: center; gap: 8px; width: fit-content; margin: 0 auto 12px; padding: 8px 13px; border: 1px solid #f3d9a8; border-radius: 999px; color: #966322; background: #fff8e9; font-size: .7rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+    .showtime::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #e97479; box-shadow: 0 0 0 4px rgba(233, 116, 121, .15); animation: glow 1.5s ease-in-out infinite; }
+    @keyframes glow { 50% { box-shadow: 0 0 0 7px rgba(233, 116, 121, 0); } }
+    .photo-frame { position: relative; display: grid; place-items: center; min-height: 360px; overflow: hidden; isolation: isolate; border: 7px solid #6d2848; border-radius: 21px; background: radial-gradient(ellipse at 50% 25%, #704360 0, #321d37 55%, #1e172c 100%); box-shadow: inset 0 0 45px rgba(16, 8, 24, .6), 0 10px 24px rgba(66, 31, 51, .18); }
+    .photo-frame::before, .photo-frame::after { position: absolute; z-index: 2; top: 0; bottom: 0; width: clamp(16px, 4vw, 34px); content: ''; pointer-events: none; background: repeating-linear-gradient(90deg, rgba(255,255,255,.1) 0 2px, transparent 2px 9px), linear-gradient(90deg, #55213c, #9e4161 52%, #59223f); box-shadow: 0 0 14px rgba(24, 10, 25, .4); }
+    .photo-frame::before { left: 0; border-right: 2px solid rgba(255, 222, 186, .55); }
+    .photo-frame::after { right: 0; border-left: 2px solid rgba(255, 222, 186, .55); }
+    .photo-frame img { position: relative; z-index: 1; display: none; width: calc(100% - clamp(40px, 9vw, 82px)); height: min(58vw, 460px); min-height: 320px; border: 3px solid rgba(255, 246, 224, .92); border-radius: 5px; background: #291b30; box-shadow: 0 0 34px rgba(255, 220, 184, .27), 0 10px 34px rgba(0,0,0,.4); object-fit: contain; animation: fade .55s ease; }
+    .photo-frame.has-photo img { display: block; }
+    @keyframes fade { from { opacity: .5; } to { opacity: 1; } }
+    .empty-photo { padding: 30px; text-align: center; }
+    .empty-photo .camera { display: grid; place-items: center; width: 74px; height: 74px; margin: 0 auto 15px; border-radius: 50%; background: rgba(255,255,255,.65); font-size: 2rem; }
+    .empty-photo strong { display: block; margin-bottom: 7px; font: 600 1.35rem 'Playfair Display', Georgia, serif; }
+    .empty-photo span { color: var(--muted); font-size: .9rem; }
+    .photo-frame.has-photo .empty-photo { display: none; }
+    .photo-caption { position: absolute; z-index: 3; right: clamp(42px, 10vw, 90px); bottom: 18px; left: clamp(42px, 10vw, 90px); display: none; padding: 24px 12px 10px; color: white; background: linear-gradient(transparent, rgba(27, 15, 30, .78)); font-weight: 600; text-align: center; text-shadow: 0 1px 5px rgba(0,0,0,.25); }
+    .photo-frame.has-photo .photo-caption { display: block; }
+    .gallery-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
+    .gallery-controls .group { display: flex; align-items: center; gap: 9px; }
+    .nav-button { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid #efdce1; border-radius: 50%; color: var(--berry-dark); background: white; cursor: pointer; font-size: 1.1rem; }
+    .nav-button:hover { background: #fff0f3; }
+    .counter { min-width: 54px; color: var(--muted); text-align: center; font-size: .87rem; }
+    .play-button { display: inline-flex; align-items: center; gap: 7px; min-height: 42px; padding: 0 15px; border: 1px solid #efdce1; border-radius: 999px; color: var(--berry-dark); background: white; cursor: pointer; font-size: .85rem; font-weight: 700; }
+    .play-button:hover { background: #fff0f3; }
+    .upload { display: inline-flex; align-items: center; gap: 8px; }
+    .photo-status { min-height: 20px; margin: 10px 0 0; color: var(--berry-dark); font-size: .85rem; line-height: 1.45; }
+    .bunny-audience { display: flex; align-items: end; justify-content: center; gap: 12px; min-height: 112px; margin: 5px auto -4px; }
+    .bunny-art { width: 112px; height: 100px; overflow: visible; animation: bunny-bob 2.8s ease-in-out infinite; }
+    @keyframes bunny-bob { 50% { transform: translateY(-4px) rotate(1deg); } }
+    .bunny-note { position: relative; max-width: 235px; margin-bottom: 25px; padding: 10px 14px; border: 1px solid #f2dce0; border-radius: 16px 16px 16px 4px; color: #795261; background: #fff8fa; font-size: .82rem; line-height: 1.45; }
+    .bunny-note strong { color: var(--berry-dark); }
+    .bunny-note::after { position: absolute; bottom: -7px; left: -1px; width: 12px; height: 12px; content: ''; background: #fff8fa; border-left: 1px solid #f2dce0; transform: skewY(-38deg); }
+    input[type="file"] { display: none; }
+    .footer { margin-top: 36px; color: var(--muted); text-align: center; font-size: .83rem; }
+    .confetti-heart { position: fixed; z-index: 5; top: -30px; pointer-events: none; animation: fall 2.8s linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(540deg); opacity: 0; } }
+    @media (max-width: 600px) {
+      body { min-width: 320px; }
+      .page { width: calc(100% - 24px); padding: max(14px, env(safe-area-inset-top)) 0 max(30px, env(safe-area-inset-bottom)); }
+      .hero { padding: 24px 3px 26px; }
+      .eyebrow { font-size: .68rem; letter-spacing: .15em; }
+      h1 { margin: 10px 0 12px; font-size: clamp(2.45rem, 11vw, 3.6rem); }
+      .intro { max-width: 34rem; font-size: .98rem; line-height: 1.6; }
+      .card { border-radius: 22px; }
+      .quiz { padding: 22px 18px; }
+      .quiz-top { gap: 12px; margin-bottom: 20px; }
+      .question { min-height: 0; margin-bottom: 18px; font-size: clamp(1.45rem, 7vw, 1.85rem); }
+      .answer { min-height: 50px; padding: 13px 15px; font-size: .94rem; line-height: 1.4; }
+      .quiz-bottom { align-items: stretch; flex-direction: column; margin-top: 18px; }
+      .feedback { max-width: none; min-height: 20px; font-size: .84rem; }
+      .primary { min-height: 48px; }
+      .surprise { margin-top: 22px; }
+      .letter { padding: 26px 21px; }
+      .letter h2, .gallery-heading h2 { margin: 8px 0 15px; font-size: clamp(1.85rem, 8vw, 2.45rem); }
+      .letter p { font-size: .96rem; line-height: 1.78; }
+      .signature { margin-top: 20px !important; }
+      .gallery { margin-top: 22px; padding: 21px 16px; border-radius: 22px; }
+      .gallery-heading { display: block; margin-bottom: 16px; }
+      .gallery-heading p { margin-top: 9px; font-size: .85rem; }
+      .showtime { max-width: 100%; margin-bottom: 10px; padding: 7px 10px; font-size: .62rem; letter-spacing: .09em; }
+      .photo-frame { min-height: 0; border-width: 5px; border-radius: 16px; }
+      .photo-frame img { width: calc(100% - 42px); height: min(68svh, 500px); min-height: 0; max-height: 500px; }
+      .photo-frame::before, .photo-frame::after { width: 17px; }
+      .photo-caption { right: 24px; bottom: 8px; left: 24px; font-size: .84rem; }
+      .gallery-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+      .gallery-controls > .group { min-width: 0; justify-content: center; gap: 7px; }
+      .nav-button { width: 44px; height: 44px; flex: 0 0 44px; }
+      .counter { min-width: 48px; font-size: .8rem; }
+      .play-button { width: 100%; min-height: 46px; justify-content: center; padding: 0 8px; font-size: .82rem; }
+      .gallery-controls > .group:last-child { display: none; }
+      .photo-status { font-size: .79rem; }
+      .bunny-audience { gap: 4px; min-height: 94px; margin-top: 8px; }
+      .bunny-art { width: 86px; height: 82px; flex: 0 0 86px; }
+      .bunny-note { max-width: 190px; margin-bottom: 15px; padding: 9px 11px; font-size: .74rem; }
+      .footer { margin-top: 24px; }
+    }
+    @media (max-width: 360px) {
+      .page { width: calc(100% - 18px); }
+      .gallery { padding-right: 12px; padding-left: 12px; }
+      .gallery-controls { column-gap: 6px; }
+      .play-button { font-size: .75rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <span class="sparkle one" aria-hidden="true">✦</span>
+  <span class="sparkle two" aria-hidden="true">♡</span>
+  <span class="sparkle three" aria-hidden="true">✧</span>
+  <main class="page">
+    <header class="hero">
+      <div class="eyebrow"><span class="tiny-heart">♥</span> a tiny birthday surprise</div>
+      <h1>Happy birthday,<br><span>my favorite person.</span></h1>
+      <p class="intro">Before your surprise, I have a very important little questionnaire for you. Choose wisely—wrong answers get a playful second chance. 😉</p>
+    </header>
+
+    <section class="quiz card" aria-labelledby="question" id="quiz">
+      <div class="quiz-top"><span id="step-label">Question 1 of 3</span><div class="progress" aria-label="Quiz progress"><span id="progress-fill"></span></div></div>
+      <h2 class="question" id="question">Who is the birthday girl’s biggest fan?</h2>
+      <div class="answers" id="answers"></div>
+      <div class="quiz-bottom"><span class="feedback" id="feedback" aria-live="polite">Choose carefully… 😉</span><button class="primary" id="next-button" type="button" disabled>Next question <span aria-hidden="true">→</span></button></div>
+    </section>
+
+    <section class="surprise" id="surprise" aria-live="polite">
+      <article class="letter card">
+        <div class="eyebrow">a little love note</div>
+        <h2>For the girl who makes life sweeter</h2>
+        <p>Happy birthday to the person who makes ordinary days feel a little brighter just by being in them. I hope you know how much I adore your heart, your laugh, your way of seeing the world, and all the little things that make you unmistakably you. Being by your side is one of my favorite parts of life, and I feel so lucky for every conversation, every silly moment, every hug, and every memory we get to make together. You deserve to feel celebrated today and every day—not just for everything you do, but simply for who you are. I hope this next year brings you the kind of joy you give to everyone around you, new reasons to smile, and all the love your heart can hold. Thank you for being my person, my safe place, and my favorite adventure. I love you more than a page like this could ever fit. Happy birthday, beautiful.</p>
+        <p class="signature">All my love, always ♥</p>
+      </article>
+
+      <section class="gallery card" aria-labelledby="gallery-title">
+        <div class="gallery-heading"><div><div class="eyebrow">the birthday girl</div><h2 id="gallery-title">Susan, in the spotlight</h2></div><p>A little celebration of you, your lovely smile, and all the things that make you wonderful.</p></div>
+        <div class="showtime">Now showing · starring Susan</div>
+        <div class="photo-frame" id="photo-frame">
+          <img id="slide-image" alt="A favorite birthday memory" />
+          <div class="empty-photo"><div class="camera" aria-hidden="true">📸</div><strong>Susan’s spotlight moments</strong><span>A collection of photos celebrating the birthday girl.</span></div>
+          <div class="photo-caption" id="photo-caption"></div>
+        </div>
+        <div class="gallery-controls">
+          <div class="group"><button class="nav-button" id="previous" type="button" aria-label="Previous photo">←</button><span class="counter" id="counter">0 / 0</span><button class="nav-button" id="next" type="button" aria-label="Next photo">→</button></div>
+          <button class="play-button" id="play-toggle" type="button" aria-label="Play slideshow">▶ <span>Play show</span></button>
+          <button class="play-button" id="music-toggle" type="button" aria-label="Play Lover Girl">♫ <span>Play music</span></button>
+          <div class="group"><span class="secondary upload">♡ Favorite memories</span></div>
+        </div>
+        <audio id="birthday-music" preload="auto" playsinline></audio>
+        <p class="photo-status" id="music-status" aria-live="polite">Lover Girl will play when the photo show begins.</p>
+        <p class="photo-status" id="photo-status" aria-live="polite">A little collection celebrating Susan ♥</p>
+        <div class="bunny-audience" aria-label="A little bunny watching the birthday slideshow">
+          <svg class="bunny-art" viewBox="0 0 140 120" role="img" aria-labelledby="bunny-title">
+            <title id="bunny-title">A cute bunny watching the show and wearing a tiny watch</title>
+            <ellipse cx="68" cy="112" rx="45" ry="6" fill="#ead5d6" opacity=".55" />
+            <path d="M43 50 C30 18 39 5 49 9 C60 13 61 34 61 48Z" fill="#fff9f4" stroke="#d8b8b2" stroke-width="2" />
+            <path d="M47 36 C41 18 45 13 49 15 C55 18 55 31 56 39Z" fill="#f2b9c4" />
+            <path d="M69 47 C67 16 77 5 86 12 C95 19 88 39 82 51Z" fill="#fff9f4" stroke="#d8b8b2" stroke-width="2" />
+            <path d="M76 37 C77 19 82 15 86 18 C90 23 85 35 81 41Z" fill="#f2b9c4" />
+            <ellipse cx="65" cy="78" rx="38" ry="34" fill="#fff9f4" stroke="#d8b8b2" stroke-width="2" />
+            <ellipse cx="65" cy="103" rx="29" ry="23" fill="#fff9f4" stroke="#d8b8b2" stroke-width="2" />
+            <ellipse cx="52" cy="76" rx="3.5" ry="4.5" fill="#57384b" />
+            <ellipse cx="78" cy="76" rx="3.5" ry="4.5" fill="#57384b" />
+            <ellipse cx="44" cy="84" rx="6" ry="3.5" fill="#f1c0c6" opacity=".85" />
+            <ellipse cx="86" cy="84" rx="6" ry="3.5" fill="#f1c0c6" opacity=".85" />
+            <path d="M62 83 Q65 80 68 83 Q65 88 62 83Z" fill="#d87891" />
+            <path d="M65 87 Q61 92 57 88 M65 87 Q69 92 73 88" fill="none" stroke="#8a5c69" stroke-width="1.7" stroke-linecap="round" />
+            <path d="M40 104 Q50 94 59 105 M90 104 Q81 94 72 105" fill="none" stroke="#fff9f4" stroke-width="8" stroke-linecap="round" />
+            <path d="M40 104 Q50 94 59 105" fill="none" stroke="#d8b8b2" stroke-width="2" stroke-linecap="round" />
+            <rect x="37" y="96" width="13" height="12" rx="3" fill="#e9bb6d" stroke="#b98647" stroke-width="1.5" transform="rotate(-20 43.5 102)" />
+            <circle cx="43.5" cy="102" r="3" fill="#fff8e9" stroke="#b98647" stroke-width="1" />
+            <path d="M60 47 Q65 39 70 47 Q77 42 79 50 Q70 56 65 52 Q59 57 52 51 Q54 43 60 47Z" fill="#d87591" />
+            <circle cx="65" cy="50" r="3" fill="#f7d8a1" />
+          </svg>
+          <div class="bunny-note"><strong>Best seat in the house!</strong><br>I'm watching your fabulous moments, Susan! ⌚🐰</div>
+        </div>
+      </section>
+    </section>
+    <footer class="footer">Made with a whole lot of love <span aria-hidden="true">♥</span></footer>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        prompt: 'What’s my favorite thing about being with you?',
+        choices: ['Even ordinary days turn into our own little adventure.', 'Your talent for stealing all the blankets.', 'That you let me pretend I’m always right.'],
+        correct: 0,
+        replies: ['Exactly. Every day is better when it’s a day with you. 💘', 'A very close second—and I still love you, blanket thief.', 'Bold answer. I admire the confidence, though. 😉']
+      },
+      {
+        prompt: 'What do I hope we make lots more of this year?',
+        choices: ['A shared calendar with absolutely no free weekends.', 'A very serious cake-tasting spreadsheet.', 'Laughs, little dates, and new memories together.'],
+        correct: 2,
+        replies: ['Cute idea, but I’m not scheduling every minute with you. 😄', 'I support the research, but you know my real answer!', 'Yes! More of all our favorite little moments. ✨']
+      },
+      {
+        prompt: 'What’s the best part of my day?',
+        choices: ['When the takeout arrives.', 'Getting to share it with you.', 'When you admit I picked the better movie.'],
+        correct: 1,
+        replies: ['Food is wonderful, but you’re my favorite. 🍰', 'You got it. It’s always better with you in it. 💞', 'That has happened exactly… once. Try again, birthday girl. 😘']
+      }
+    ];
+    let questionIndex = 0;
+    let selectedIndex = null;
+    let retryTimer = null;
+    const questionEl = document.getElementById('question');
+    const answersEl = document.getElementById('answers');
+    const stepLabel = document.getElementById('step-label');
+    const progressFill = document.getElementById('progress-fill');
+    const feedback = document.getElementById('feedback');
+    const nextButton = document.getElementById('next-button');
+
+    function renderQuestion() {
+      const current = questions[questionIndex];
+      selectedIndex = null;
+      questionEl.textContent = current.prompt;
+      stepLabel.textContent = `Question ${questionIndex + 1} of ${questions.length}`;
+      progressFill.style.width = `${(questionIndex / questions.length) * 100}%`;
+      feedback.textContent = 'Choose carefully… 😉';
+      nextButton.disabled = true;
+      nextButton.innerHTML = questionIndex === questions.length - 1 ? 'Reveal my surprise <span aria-hidden="true">♥</span>' : 'Next question <span aria-hidden="true">→</span>';
+      answersEl.replaceChildren(...current.choices.map((choice, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'answer';
+        button.textContent = choice;
+        button.addEventListener('click', () => {
+          window.clearTimeout(retryTimer);
+          answersEl.querySelectorAll('.answer').forEach(item => item.classList.remove('selected'));
+          if (index !== current.correct) {
+            selectedIndex = null;
+            nextButton.disabled = true;
+            feedback.textContent = current.replies[index];
+            const quizCard = document.getElementById('quiz');
+            quizCard.classList.remove('try-again');
+            void quizCard.offsetWidth;
+            quizCard.classList.add('try-again');
+            retryTimer = window.setTimeout(() => {
+              quizCard.classList.remove('try-again');
+              feedback.textContent = 'Have another guess, birthday girl… 😉';
+              retryTimer = null;
+            }, 1700);
+            return;
+          }
+          selectedIndex = index;
+          button.classList.add('selected');
+          feedback.textContent = current.replies[index];
+          nextButton.disabled = false;
+        });
+        return button;
+      }));
+    }
+
+    function celebrate() {
+      const colors = ['#bd5574', '#e8a4a8', '#f4c27a', '#9c3d5d'];
+      for (let index = 0; index < 34; index += 1) {
+        const heart = document.createElement('span');
+        heart.className = 'confetti-heart';
+        heart.textContent = Math.random() > .35 ? '♥' : '✦';
+        heart.style.left = `${Math.random() * 100}vw`;
+        heart.style.color = colors[index % colors.length];
+        heart.style.fontSize = `${12 + Math.random() * 19}px`;
+        heart.style.animationDelay = `${Math.random() * .8}s`;
+        document.body.append(heart);
+        window.setTimeout(() => heart.remove(), 3800);
+      }
+    }
+
+    nextButton.addEventListener('click', () => {
+      if (selectedIndex === null) return;
+      if (questionIndex < questions.length - 1) {
+        questionIndex += 1;
+        renderQuestion();
+      } else {
+        progressFill.style.width = '100%';
+        document.getElementById('quiz').style.display = 'none';
+        document.getElementById('surprise').classList.add('show');
+        startBirthdayShow();
+        celebrate();
+        document.getElementById('surprise').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+    renderQuestion();
+
+    const frame = document.getElementById('photo-frame');
+    const slideImage = document.getElementById('slide-image');
+    const caption = document.getElementById('photo-caption');
+    const counter = document.getElementById('counter');
+    const playToggle = document.getElementById('play-toggle');
+    const musicToggle = document.getElementById('music-toggle');
+    const birthdayMusic = document.getElementById('birthday-music');
+    const musicStatus = document.getElementById('music-status');
+    const musicTracks = [
+      { title: 'Lover Girl', url: 'music/Lover%20Girl%20-%20Tatiana%20Manaois%20%5BLyrics%5D.mp3' },
+      { title: 'If the World Was Ending', url: 'music/JP%20Saxe%20-%20If%20the%20World%20Was%20Ending%20%28Official%20Video%29%20ft.%20Julia%20Michaels.mp3' }
+    ];
+    const photos = [
+      'b.jpeg',
+      'WhatsApp Image 2026-09-26 at 21.03.29.jpeg',
+      'WhatsApp Image 2026-09-26 at 21.12.21.jpeg',
+      'WhatsApp Image 2026-09-27 at 02.14.31.jpeg',
+      'WhatsApp Image 2026-09-27 at 02.14.31 (1).jpeg',
+      'WhatsApp Image 2026-09-27 at 02.14.31 (2).jpeg',
+      'WhatsApp Image 2026-09-27 at 02.14.32.jpeg',
+      'WhatsApp Image 2026-09-27 at 02.14.32 (1).jpeg',
+      'WhatsApp Image 2026-10-08 at 09.31.49.jpeg',
+      'WhatsApp Image 2026-10-15 at 22.19.28.jpeg',
+      'WhatsApp Image 2026-10-15 at 22.19.29.jpeg',
+      'WhatsApp Image 2026-10-15 at 22.19.30.jpeg',
+      'WhatsApp Image 2026-10-18 at 16.19.55.jpeg',
+      'WhatsApp Image 2026-10-18 at 16.58.01.jpeg',
+      'WhatsApp Image 2026-10-24 at 12.12.58.jpeg',
+      'WhatsApp Image 2026-10-24 at 12.12.59.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.30.47.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.30.48.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.30.49.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.30.49 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.30.50.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.30.51.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.30.52.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.30.52 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.30.53.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.30.54.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.30.55.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.06.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.06 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.07.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.07 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.08.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.08 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.09.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.09 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.11.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.11 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.12.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.12 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.13.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.13 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.14.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.14 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.15.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.15 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.16.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.17.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.17 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.17 (2).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.18.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.18 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.19.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.19 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.20.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.20 (1).jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.21.jpeg',
+      'WhatsApp Image 2026-10-29 at 08.31.21 (1).jpeg'
+    ].map(filename => ({
+      url: `susan/${encodeURIComponent(filename)}`,
+      name: filename === 'b.jpeg' ? 'A favorite moment' : filename.replace(/\.[^.]+$/, '').replace(/^WhatsApp Image /, '').replace(/ \([0-9]+\)$/, '').replace(/ at /, ' · ')
+    }));
+    let currentPhoto = 0;
+    let slideshowTimer = null;
+    let currentTrack = 0;
+    let musicEnabled = true;
+    let triedBackupTrack = false;
+
+    function showPhoto(index) {
+      if (!photos.length) return;
+      currentPhoto = (index + photos.length) % photos.length;
+      const photo = photos[currentPhoto];
+      slideImage.src = photo.url;
+      slideImage.alt = photo.name ? `Birthday memory: ${photo.name}` : 'A favorite birthday memory';
+      caption.textContent = photo.name;
+      counter.textContent = `${currentPhoto + 1} / ${photos.length}`;
+    }
+
+    function setSlideshowPlaying(playing) {
+      window.clearInterval(slideshowTimer);
+      slideshowTimer = null;
+      playToggle.setAttribute('aria-label', playing ? 'Pause slideshow' : 'Play slideshow');
+      playToggle.innerHTML = playing ? 'Ⅱ <span>Pause show</span>' : '▶ <span>Play show</span>';
+      if (playing && photos.length > 1) {
+        slideshowTimer = window.setInterval(() => showPhoto(currentPhoto + 1), 4200);
+      }
+    }
+
+    function updateMusicButton() {
+      const track = musicTracks[currentTrack];
+      const playing = !birthdayMusic.paused && !birthdayMusic.error;
+      musicToggle.setAttribute('aria-label', playing ? `Pause ${track.title}` : `Play ${track.title}`);
+      musicToggle.innerHTML = playing ? '♫ <span>Music on</span>' : `♫ <span>Play ${track.title}</span>`;
+    }
+
+    function playMusic() {
+      musicEnabled = true;
+      updateMusicButton();
+      const requestedSrc = birthdayMusic.currentSrc;
+      birthdayMusic.play().then(() => {
+        musicStatus.textContent = `Now playing: ${musicTracks[currentTrack].title} ♫`;
+        updateMusicButton();
+      }).catch(() => {
+        if (birthdayMusic.currentSrc !== requestedSrc) return;
+        if (birthdayMusic.error) {
+          musicStatus.textContent = `This browser couldn’t decode ${musicTracks[currentTrack].title}. Try opening the page in another browser.`;
+          musicToggle.setAttribute('aria-label', `Retry ${musicTracks[currentTrack].title}`);
+          musicToggle.innerHTML = '♫ <span>Retry music</span>';
+          return;
+        }
+        musicStatus.textContent = `Tap “Play ${musicTracks[currentTrack].title}” if your browser blocked autoplay.`;
+        musicToggle.setAttribute('aria-label', `Retry ${musicTracks[currentTrack].title}`);
+        musicToggle.innerHTML = '♫ <span>Tap to retry</span>';
+      });
+    }
+
+    function startBirthdayShow() {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) setSlideshowPlaying(true);
+      playMusic();
+    }
+
+    frame.classList.add('has-photo');
+    showPhoto(0);
+    birthdayMusic.src = musicTracks[currentTrack].url;
+    updateMusicButton();
+    birthdayMusic.addEventListener('ended', () => {
+      currentTrack = (currentTrack + 1) % musicTracks.length;
+      birthdayMusic.src = musicTracks[currentTrack].url;
+      updateMusicButton();
+      if (musicEnabled) playMusic();
+    });
+    birthdayMusic.addEventListener('error', () => {
+      if (currentTrack === 0 && !triedBackupTrack) {
+        triedBackupTrack = true;
+        currentTrack = 1;
+        birthdayMusic.src = musicTracks[currentTrack].url;
+        musicStatus.textContent = 'Lover Girl could not be opened, so I’m trying the other song in your music folder.';
+        if (musicEnabled) playMusic();
+        return;
+      }
+      musicStatus.textContent = `Could not load ${musicTracks[currentTrack].title}. Check that the music folder stays next to this page.`;
+      musicToggle.setAttribute('aria-label', `Retry ${musicTracks[currentTrack].title}`);
+      musicToggle.innerHTML = '♫ <span>Retry music</span>';
+    });
+    birthdayMusic.addEventListener('pause', updateMusicButton);
+    birthdayMusic.addEventListener('playing', updateMusicButton);
+    playToggle.addEventListener('click', () => {
+      const shouldPlay = slideshowTimer === null;
+      setSlideshowPlaying(shouldPlay);
+      if (shouldPlay) playMusic();
+    });
+    musicToggle.addEventListener('click', () => {
+      if (birthdayMusic.paused) playMusic();
+      else {
+        musicEnabled = false;
+        birthdayMusic.pause();
+        updateMusicButton();
+      }
+    });
+    document.getElementById('previous').addEventListener('click', () => showPhoto(currentPhoto - 1));
+    document.getElementById('next').addEventListener('click', () => showPhoto(currentPhoto + 1));
+  </script>
+</body>
+</html>
